@@ -1,0 +1,5 @@
+FUNCTION main :
+PARAM t0
+PARAM t1
+t2 := #0
+t3 := t2

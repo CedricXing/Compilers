@@ -158,6 +158,7 @@ int hash(char *name){
 void new_symbol(int num,...){
 	va_list valist;
 	struct Symbol *sy = (struct Symbol*)malloc(sizeof(struct Symbol));
+	sy->var_no = -1;
 	va_start(valist,num);
 	int def_type = va_arg(valist,int);
 	
@@ -833,3 +834,4 @@ void add_write_function(){
 	fc->args->type->kind = INTEGER;
 	functionTable[hashcode]=fc;
 }
+

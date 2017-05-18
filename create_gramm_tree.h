@@ -62,6 +62,7 @@ struct Symbol{
 	char *sym_name;
 	Type *tp;
 	struct Symbol *next;
+	int var_no;
 };
 
 struct Function{
@@ -136,10 +137,37 @@ struct Operand_{
 } ;
 
 struct InterCode{
-	enum { ASSIGN,ADD,SUB,MUL} kind;
+	enum { ASSIGN,ADD,SUB,MUL,LABEL,FUNCTION,GOTO,Return,DEC,ARG,CALL,PARAM,READ,WRITE} kind;
 	union{
-		struct {Operand* right,left;} assign;
-		struct {Operand* result,op1,op2;} binop;
+		struct {Operand right,left;} assign;
+		struct {Operand result,op1,op2;} binop;
+		char *function_name;
+		int arg_no;
 	} u;
 };
 
+struct InterCodes{
+	struct InterCode code;
+	struct InterCodes *next;
+};
+
+extern struct InterCodes *head;
+extern int arg_no;
+extern int var_no;
+
+void generate_InterCodes(struct Node* node);
+
+struct InterCodes* translate_exp(struct Node* exp,int place);
+struct InterCodes* translate_CompSt(struct Node *CompSt);
+struct InterCodes* translate_DefList(struct Node *DefList);
+struct InterCodes* translate_StmtList(struct Node *StmtList);
+struct InterCodes* translate_Stmt(struct Node *Stmt);
+
+//generate all kinds of InterCodes
+struct InterCodes* generate_Label(int label);
+struct InterCodes* generate_function();
+struct InterCodes* generate_assign_id_constant(int value,int place);
+struct InterCodes* generate_assign_double_id(int place1,int place2);
+
+void output_InterCodes();
+void cat_ir(struct InterCodes *code1,struct InterCodes *code2);
