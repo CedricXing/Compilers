@@ -107,11 +107,8 @@ int exist(int def_type,char *name){
 		for(int i = 0;i < 16384;++ i){
 			symbolTable[i] = NULL;
 			symbolTable1[i] = NULL;
-			functionTable[i] = NULL;
 		}
 		is_initialized = 1;
-		add_read_function();
-		add_write_function();
 	}
 
 
@@ -205,6 +202,17 @@ void new_symbol(int num,...){
 			dimens[dimen++] = temp->right_child->right_child->value_int;
 		}
 
+		/*
+		while(dimen > 0){//Multidimensional array
+			tp_temp -> kind = ARRAY;
+			tp_temp -> array.size = dimens[dimen-1];
+			-- dimen;
+			if(dimen > 0){
+				tp_temp -> array.element = (Type*)malloc(sizeof(Type));
+				tp_temp = tp_temp -> array.element;
+			}
+		}
+		*/
 		while(dimen > 0){//Multidimensional array
 			tp_temp -> array.size = dimens[dimen-1];
 			tp_temp -> kind = ARRAY;
@@ -238,7 +246,24 @@ void new_symbol(int num,...){
 		//check_array(Dec_node->attribute);
 	}
 
-	
+	/*
+	for(int i = 0;i < 16384;++ i){
+		if(symbolTable[i] != NULL){
+			//printf("%s\n",symbolTable[i]->sym_name);
+			if(symbolTable[i]->tp->kind == INTEGER)
+				printf("int %s\n",symbolTable[i]->sym_name);
+			else if(symbolTable[i]->tp->kind == FL)
+				printf("float %s\n",symbolTable[i]->sym_name);
+			else if(symbolTable[i]->tp->kind == ARRAY){
+				check_array(symbolTable[i]->sym_name);
+			}
+			else if(symbolTable[i]->tp->kind == STRUCTURE){
+				check_struct(symbolTable[i]->sym_name);
+			}
+		}
+	}
+	printf("\n\n\n\n\n");
+	*/
 }
 
 void new_struct_symbol(int num,...){
@@ -634,6 +659,7 @@ int check_op_types(struct Node *exp1,struct Node *exp2){
 		}
 		else return 0;
 	}
+	/*
 	else if(strcmp(exp1->left_child->name,"ID") == 0){
 		int hashcode = hash(exp1->left_child->attribute);
 		if(symbolTable[hashcode]==NULL)
@@ -653,15 +679,37 @@ int check_op_types(struct Node *exp1,struct Node *exp2){
 	}
 	else{
 		return 1;
+	}*/
+	else if(exp1->attribute != NULL){
+		int hashcode = hash(exp1->attribute);
+		if(symbolTable[hashcode]==NULL)
+			return 0;
+		if(symbolTable[hashcode]->tp->kind != INTEGER && symbolTable[hashcode]->tp->kind != FL)
+			return 0;
+		if(strcmp(exp2->left_child->name,"INT")==0 && symbolTable[hashcode]->tp->kind == INTEGER)
+			return 1;
+		else if(strcmp(exp2->left_child->name,"FLOAT")==0 && symbolTable[hashcode]->tp->kind == FL)
+			return 1;
+		else if(exp2->attribute!=NULL){
+			int hashcode1 = hash(exp2->attribute);
+			if(symbolTable[hashcode1]==NULL)
+				return 0;
+			return (symbolTable[hashcode]->tp->kind==symbolTable[hashcode1]->tp->kind);
+		}
 	}
 }
 
 void check_assignop(struct Node *exp1,struct Node *exp2){
+	int hashcode;
 	if(strcmp(exp1->left_child->name,"ID") != 0){
-		print_semantic_error6(yylineno);
-		return;
+		if(exp1->attribute!=NULL)
+			hashcode=hash(exp1->attribute);
+		else {
+			print_semantic_error6(yylineno);
+			return;
+		}
 	}
-	int hashcode = hash(exp1->left_child->attribute);
+	else hashcode = hash(exp1->left_child->attribute);
 	if(symbolTable[hashcode]==NULL)
 		return;
 	if(strcmp(exp2->left_child->name,"INT") == 0){
@@ -682,8 +730,13 @@ void check_assignop(struct Node *exp1,struct Node *exp2){
 			print_semantic_error5(yylineno);
 		}
 	}
-	else{
-		printf("not processed.\n");
+	else if(exp2->attribute!=NULL){
+		int hashcode1 = hash(exp2->attribute);
+		if(symbolTable[hashcode1]==NULL)
+			return;
+		if(!check_same_type(symbolTable[hashcode]->tp,symbolTable[hashcode1]->tp)){
+			print_semantic_error5(yylineno);
+		}
 	}
 }
 
@@ -759,8 +812,6 @@ void print_semantic_error16(char *name){
 void print_semantic_error17(int lineno,char *name){
 	printf("Error type 17 at Line %d: Undefined structure '%s'\n",lineno,name);
 }
-
-
 
 // experiment 3
 void add_read_function(){

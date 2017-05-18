@@ -188,17 +188,20 @@ DefList : {$$ = create_node("DefList",0,-1);}
 Def : Specifier DecList SEMI {$$ = create_node("Def",3,$1,$2,$3);
 struct Node *temp = $2->left_child;
 while(1){
-	if($1->attribute==NULL)
+	if($1->attribute==NULL){
 		break;
+	}
 	if(exist(1,temp->left_child->attribute)) 
 		print_semantic_error3(yylineno,temp->left_child->attribute);
-	else if(temp -> kind == BASIC)
+	else if(temp -> kind == BASIC){
+		//printf("%s\n",temp->left_child->attribute);
 		new_symbol(3,1,$1,temp);
+	}
 	else if(temp -> kind == ARRAY){
 		new_symbol(3,3,$1,temp);
 	}
 	if(temp -> right_child != NULL)
-		temp = temp -> right_child -> right_child;
+		temp = temp -> right_child -> right_child->left_child;
 	else break;
 }
 }
@@ -230,6 +233,7 @@ Exp : Exp ASSIGNOP Exp {$$ = create_node("Exp",3,$1,$2,$3);
   | Exp STAR Exp {$$ = create_node("Exp",3,$1,$2,$3);
   					if(!check_op_types($1,$3))
   						print_semantic_error7(yylineno);
+
   					}
   | Exp DIV Exp {$$ = create_node("Exp",3,$1,$2,$3);
   					if(!check_op_types($1,$3))
@@ -266,6 +270,7 @@ Exp : Exp ASSIGNOP Exp {$$ = create_node("Exp",3,$1,$2,$3);
   						print_semantic_error13(yylineno,$1->attribute);
   					else if(!has_field($1->attribute,$3->attribute))
   						print_semantic_error14(yylineno,$3->attribute);
+  					else {$$->attribute=$3->attribute;}
   				}
   | ID {$$ = create_node("Exp",1,$1);
   		if(!exist(1,$$->attribute))
