@@ -141,8 +141,10 @@ struct InterCode{
 	union{
 		struct {Operand right,left;} assign;
 		struct {Operand result,op1,op2;} binop;
+		Operand return_;
 		char *function_name;
 		int arg_no;
+		int label_no;
 	} u;
 };
 
@@ -152,8 +154,8 @@ struct InterCodes{
 };
 
 extern struct InterCodes *head;
-extern int arg_no;
 extern int var_no;
+extern int label_no;
 
 void generate_InterCodes(struct Node* node);
 
@@ -162,12 +164,20 @@ struct InterCodes* translate_CompSt(struct Node *CompSt);
 struct InterCodes* translate_DefList(struct Node *DefList);
 struct InterCodes* translate_StmtList(struct Node *StmtList);
 struct InterCodes* translate_Stmt(struct Node *Stmt);
+struct InterCodes* translate_Cond(struct Node *exp,int label_true,int label_false);
 
 //generate all kinds of InterCodes
-struct InterCodes* generate_Label(int label);
+struct InterCodes* generate_label(int label);
+struct InterCodes* generate_goto(int label);
 struct InterCodes* generate_function();
+struct InterCodes* generate_return(int place);
 struct InterCodes* generate_assign_id_constant(int value,int place);
 struct InterCodes* generate_assign_double_id(int place1,int place2);
+struct InterCodes* generate_plus_double_id(int place,int place1,int place2);
+struct InterCodes* generate_minus_constant_id(int place,int constant,int place1);
 
 void output_InterCodes();
 void cat_ir(struct InterCodes *code1,struct InterCodes *code2);
+
+//some little functions
+int check_has_else(struct Node *Stmt);
