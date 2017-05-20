@@ -137,15 +137,18 @@ struct Operand_{
 } ;
 
 struct InterCode{
-	enum { ASSIGN,ADD,SUB,MUL,LABEL,FUNCTION,GOTO,Return,DEC,ARG,CALL,PARAM,READ,WRITE} kind;
+	enum { ASSIGN,ADD,SUB,MUL,LABEL,FUNCTION,GOTO,Return,DEC,ARG,CALL,PARAM,READ,WRITE,If} kind;
 	union{
 		struct {Operand right,left;} assign;
 		struct {Operand result,op1,op2;} binop;
+		struct {Operand op1,op2;} double_op;
 		Operand return_;
 		char *function_name;
 		int arg_no;
-		int label_no;
 	} u;
+	char *relop;
+	int label_no;
+	int var_no;
 };
 
 struct InterCodes{
@@ -165,19 +168,30 @@ struct InterCodes* translate_DefList(struct Node *DefList);
 struct InterCodes* translate_StmtList(struct Node *StmtList);
 struct InterCodes* translate_Stmt(struct Node *Stmt);
 struct InterCodes* translate_Cond(struct Node *exp,int label_true,int label_false);
+struct InterCodes* translate_Args(struct Node *Args,int *arg_list);
 
 //generate all kinds of InterCodes
 struct InterCodes* generate_label(int label);
 struct InterCodes* generate_goto(int label);
 struct InterCodes* generate_function();
 struct InterCodes* generate_return(int place);
+struct InterCodes* generate_read(int place);
+struct InterCodes* generate_write(int place);
+struct InterCodes* generate_arg(int place);
+struct InterCodes* generate_call(int place,char *function_name);
 struct InterCodes* generate_assign_id_constant(int value,int place);
 struct InterCodes* generate_assign_double_id(int place1,int place2);
 struct InterCodes* generate_plus_double_id(int place,int place1,int place2);
 struct InterCodes* generate_minus_constant_id(int place,int constant,int place1);
+struct InterCodes* generate_minus_double_id(int place,int place1,int place2);
+struct InterCodes* generate_star_double_id(int place,int place1,int place2);
+struct InterCodes* generate_div_double_id(int place,int place1,int place2);
+struct InterCodes* generate_if_double_id(int place1,int place2,char *relop,int label);
+struct InterCodes* generate_if_id_constant(int place,int constant,char *relop,int label);
 
 void output_InterCodes();
 void cat_ir(struct InterCodes *code1,struct InterCodes *code2);
 
 //some little functions
 int check_has_else(struct Node *Stmt);
+void check_ir(struct InterCodes* ir);

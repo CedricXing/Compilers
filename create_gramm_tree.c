@@ -42,7 +42,7 @@ struct Node* create_node(char *name,int num,...){
 		p_node -> line = arg;
 		if(p_node -> line != -1)//zhong jie fu
 			p_node -> is_terminator = 1;
-		if(strcmp(name,"ID") == 0 || strcmp(name,"TYPE") == 0){
+		if(strcmp(name,"ID") == 0 || strcmp(name,"TYPE") == 0 || strcmp(name,"RELOP") == 0){
 			p_node -> attribute = (char*)malloc(sizeof(char) * 30);
 			strcpy(p_node -> attribute,yytext);
 		}
@@ -104,6 +104,8 @@ void yyerror(const char *s)
 
 int exist(int def_type,char *name){
 	if(!is_initialized){
+		add_read_function();
+		add_write_function();
 		for(int i = 0;i < 16384;++ i){
 			symbolTable[i] = NULL;
 			symbolTable1[i] = NULL;

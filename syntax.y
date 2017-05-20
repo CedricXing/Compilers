@@ -150,7 +150,7 @@ VarList : ParamDec COMMA VarList {$$ = create_node("VarList",3,$1,$2,$3);}
 ParamDec : Specifier VarDec {$$ = create_node("ParamDec",2,$1,$2);}
   ;
 
-CompSt : LC DefList StmtList RC {$$ = create_node("Compst",4,$1,$2,$3,$4);
+CompSt : LC DefList StmtList RC {$$ = create_node("CompSt",4,$1,$2,$3,$4);
 	$$->attribute = $3->attribute;
 	$$->kind = $3->kind;
 	}
@@ -217,47 +217,47 @@ Dec : VarDec {$$ = create_node("Dec",1,$1);}
   ;
 
 Exp : Exp ASSIGNOP Exp {$$ = create_node("Exp",3,$1,$2,$3);
-							check_assignop($1,$3);
+							//check_assignop($1,$3);
 						}
   | Exp AND Exp {$$ = create_node("Exp",3,$1,$2,$3);}
   | Exp OR Exp {$$ = create_node("Exp",3,$1,$2,$3);}
   | Exp RELOP Exp {$$ = create_node("Exp",3,$1,$2,$3);}
   | Exp PLUS Exp {$$ = create_node("Exp",3,$1,$2,$3);
-  					if(!check_op_types($1,$3))
-  						print_semantic_error7(yylineno);
+  					//if(!check_op_types($1,$3))
+  						//print_semantic_error7(yylineno);
   					}
   | Exp MINUS Exp {$$ = create_node("Exp",3,$1,$2,$3);
-  					if(!check_op_types($1,$3))
-  						print_semantic_error7(yylineno);
+  					//if(!check_op_types($1,$3))
+  						//print_semantic_error7(yylineno);
   					}
   | Exp STAR Exp {$$ = create_node("Exp",3,$1,$2,$3);
-  					if(!check_op_types($1,$3))
-  						print_semantic_error7(yylineno);
+  					//if(!check_op_types($1,$3))
+  						//print_semantic_error7(yylineno);
 
   					}
   | Exp DIV Exp {$$ = create_node("Exp",3,$1,$2,$3);
-  					if(!check_op_types($1,$3))
-  						print_semantic_error7(yylineno);
+  					//if(!check_op_types($1,$3))
+  						//print_semantic_error7(yylineno);
   					}
   | LP Exp RP {$$ = create_node("Exp",3,$1,$2,$3);}
   | MINUS Exp {$$ = create_node("Exp",2,$1,$2);}
   | NOT Exp  {$$ = create_node("Exp",2,$1,$2);}
   | ID LP Args RP {$$ = create_node("Exp",4,$1,$2,$3,$4);
-  					if(exist_var($1->attribute))
-  						print_semantic_error11(yylineno,$1->attribute);
-  					else if(!exist_function($1->attribute))
-  						print_semantic_error2(yylineno,$1->attribute);
+  					//if(exist_var($1->attribute))
+  						//print_semantic_error11(yylineno,$1->attribute);
+  					//else if(!exist_function($1->attribute))
+  						//print_semantic_error2(yylineno,$1->attribute);
   					
-  					else if(!check_args($1->attribute,$3))
-  						print_semantic_error9(yylineno,$1->attribute);
+  					//else if(!check_args($1->attribute,$3))
+  						//print_semantic_error9(yylineno,$1->attribute);
   						}
   | ID LP RP {$$ = create_node("Exp",3,$1,$2,$3);
-  					if(exist_var($1->attribute))
-  						print_semantic_error11(yylineno,$1->attribute);
-  					else if(!exist_function($1->attribute))
-  						print_semantic_error2(yylineno,$1->attribute);
-  					else if(!check_args($1->attribute,NULL))
-  						print_semantic_error9(yylineno,$1->attribute);
+  					//if(exist_var($1->attribute))
+  						//print_semantic_error11(yylineno,$1->attribute);
+  					//else if(!exist_function($1->attribute))
+  						//print_semantic_error2(yylineno,$1->attribute);
+  					//else if(!check_args($1->attribute,NULL))
+  						//print_semantic_error9(yylineno,$1->attribute);
   						}
   | Exp LB Exp RB {$$ = create_node("Exp",4,$1,$2,$3,$4);
   					if(!check_is_array($1->attribute))
