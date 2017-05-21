@@ -517,6 +517,7 @@ struct InterCodes* translate_Args(struct Node *Args,int *arg_list){
 		arg_list[0] = temp;
 		for(int j = 0;j < i;++ j)
 			arg_list[j+1]=arg_temp[j];
+		free(arg_temp);
 		return code1;
 	}
 	else{
@@ -531,6 +532,7 @@ struct InterCodes* translate_Args(struct Node *Args,int *arg_list){
 		arg_list[0] = temp;
 		for(int j = 0;j < i;++ j)
 			arg_list[j+1]=arg_temp[j];
+		free(arg_temp);
 		struct InterCodes *code2 = translate_Args(Args->left_child->right_child->right_child,arg_list);
 		cat_ir(code1,code2);
 		return code1;
