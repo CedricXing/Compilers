@@ -161,6 +161,7 @@ void new_symbol(int num,...){
 	va_list valist;
 	struct Symbol *sy = (struct Symbol*)malloc(sizeof(struct Symbol));
 	sy->var_no = -1;
+	sy->is_arg_array = 0;
 	va_start(valist,num);
 	int def_type = va_arg(valist,int);
 	
@@ -180,6 +181,7 @@ void new_symbol(int num,...){
 		sy->sym_name = temp->attribute;
 
 		int hashcode = hash(temp -> attribute);
+		//printf("%s\n",temp->attribute);
 		if(symbolTable[hashcode] == NULL)
 			symbolTable[hashcode] = sy;
 		else printf("open hashing error!\n");
@@ -252,6 +254,7 @@ void new_symbol(int num,...){
 	/*
 	for(int i = 0;i < 16384;++ i){
 		if(symbolTable[i] != NULL){
+			printf("%d\n",i);
 			//printf("%s\n",symbolTable[i]->sym_name);
 			if(symbolTable[i]->tp->kind == INTEGER)
 				printf("int %s\n",symbolTable[i]->sym_name);

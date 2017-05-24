@@ -191,8 +191,8 @@ while(1){
 	if($1->attribute==NULL){
 		break;
 	}
-	if(exist(1,temp->left_child->attribute)) 
-		print_semantic_error3(yylineno,temp->left_child->attribute);
+  if(exist(1,temp->left_child->attribute)) 
+    print_semantic_error3(yylineno,temp->left_child->attribute);
 	else if(temp -> kind == BASIC){
 		//printf("%s\n",temp->left_child->attribute);
 		new_symbol(3,1,$1,temp);
@@ -213,7 +213,7 @@ DecList : Dec {$$ = create_node("DecList",1,$1);}
   ;
 
 Dec : VarDec {$$ = create_node("Dec",1,$1);}
-  | VarDec ASSIGNOP Exp {$$ = create_node("Dec",3,$1,$2,$3);$$->attribute = $1->attribute;}
+  | VarDec ASSIGNOP Exp {$$ = create_node("Dec",3,$1,$2,$3);$$->attribute = $1->attribute;$$->kind = BASIC;}
   ;
 
 Exp : Exp ASSIGNOP Exp {$$ = create_node("Exp",3,$1,$2,$3);
@@ -260,10 +260,10 @@ Exp : Exp ASSIGNOP Exp {$$ = create_node("Exp",3,$1,$2,$3);
   						//print_semantic_error9(yylineno,$1->attribute);
   						}
   | Exp LB Exp RB {$$ = create_node("Exp",4,$1,$2,$3,$4);
-  					if(!check_is_array($1->attribute))
-  						print_semantic_error10(yylineno,$1->attribute);
-  					else if(strcmp($3->left_child->name,"FLOAT") == 0)
-  						print_semantic_error12(yylineno,$3->left_child->value_float);
+  					//if(!check_is_array($1->attribute))
+  						//print_semantic_error10(yylineno,$1->attribute);
+  					//else if(strcmp($3->left_child->name,"FLOAT") == 0)
+  						//print_semantic_error12(yylineno,$3->left_child->value_float);
   				  }
   | Exp DOT ID {$$ = create_node("Exp",3,$1,$2,$3);
   					if(!check_is_struct($1->attribute))
@@ -273,8 +273,8 @@ Exp : Exp ASSIGNOP Exp {$$ = create_node("Exp",3,$1,$2,$3);
   					else {$$->attribute=$3->attribute;}
   				}
   | ID {$$ = create_node("Exp",1,$1);
-  		if(!exist(1,$$->attribute))
-  			print_semantic_error1(yylineno,$$->attribute);
+  		//if(!exist(1,$$->attribute))
+  			//print_semantic_error1(yylineno,$$->attribute);
   		}
   | INT {$$ = create_node("Exp",1,$1);
   }

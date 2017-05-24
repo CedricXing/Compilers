@@ -63,6 +63,7 @@ struct Symbol{
 	Type *tp;
 	struct Symbol *next;
 	int var_no;
+	int is_arg_array;
 };
 
 struct Function{
@@ -137,18 +138,19 @@ struct Operand_{
 } ;
 
 struct InterCode{
-	enum { ASSIGN,ADD,SUB,MUL,LABEL,FUNCTION,GOTO,Return,DEC,ARG,CALL,PARAM,READ,WRITE,If} kind;
+	enum { ASSIGN,ADD,SUB,MUL,LABEL,FUNCTION,GOTO,Return,DEC,ARG,CALL,PARAM,READ,WRITE,If,GET_ADDRESS,GET_VALUE} kind;
 	union{
 		struct {Operand right,left;} assign;
 		struct {Operand result,op1,op2;} binop;
 		struct {Operand op1,op2;} double_op;
-		Operand return_;
+		Operand op;
 		char *function_name;
 		int arg_no;
 	} u;
 	char *relop;
 	int label_no;
 	int var_no;
+	int space;
 };
 
 struct InterCodes{
@@ -159,16 +161,22 @@ struct InterCodes{
 extern struct InterCodes *head;
 extern int var_no;
 extern int label_no;
+extern char *output_file;
 
 void generate_InterCodes(struct Node* node);
 
 struct InterCodes* translate_exp(struct Node* exp,int place);
 struct InterCodes* translate_CompSt(struct Node *CompSt);
 struct InterCodes* translate_DefList(struct Node *DefList);
+struct InterCodes* translate_Def(struct Node *Def);
+struct InterCodes* translate_DecList(struct Node *DecList);
+struct InterCodes* translate_Dec(struct Node *Dec);
+struct InterCodes* translate_VarDec(struct Node *VarDec);
 struct InterCodes* translate_StmtList(struct Node *StmtList);
 struct InterCodes* translate_Stmt(struct Node *Stmt);
 struct InterCodes* translate_Cond(struct Node *exp,int label_true,int label_false);
 struct InterCodes* translate_Args(struct Node *Args,int *arg_list);
+struct InterCodes* translate_arr_left_operand(struct Node *exp,int place);
 
 //generate all kinds of InterCodes
 struct InterCodes* generate_label(int label);
@@ -185,9 +193,14 @@ struct InterCodes* generate_plus_double_id(int place,int place1,int place2);
 struct InterCodes* generate_minus_constant_id(int place,int constant,int place1);
 struct InterCodes* generate_minus_double_id(int place,int place1,int place2);
 struct InterCodes* generate_star_double_id(int place,int place1,int place2);
+struct InterCodes* generate_star_id_constant(int place,int place1,int constant);
 struct InterCodes* generate_div_double_id(int place,int place1,int place2);
 struct InterCodes* generate_if_double_id(int place1,int place2,char *relop,int label);
 struct InterCodes* generate_if_id_constant(int place,int constant,char *relop,int label);
+struct InterCodes* generate_dec(int place,int space);
+struct InterCodes* generate_get_address(int place1,int place2);
+struct InterCodes* generate_get_value(int place,int place1);
+struct InterCodes* generate_get_value_left_operand(int place,int place1);
 
 void output_InterCodes();
 void cat_ir(struct InterCodes *code1,struct InterCodes *code2);
@@ -195,3 +208,4 @@ void cat_ir(struct InterCodes *code1,struct InterCodes *code2);
 //some little functions
 int check_has_else(struct Node *Stmt);
 void check_ir(struct InterCodes* ir);
+int get_space(int *arr_info,int i ,int index1);
