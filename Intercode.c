@@ -514,6 +514,7 @@ struct InterCodes* translate_exp(struct Node* exp,int place){
 			if(symbolTable[hashcode]->var_no == -1){
 				symbolTable[hashcode]->var_no = var_no++;
 			}
+			//printf("%s\n",exp->left_child->right_child->right_child->left_child->right_child->name);
 			struct InterCodes* code1 = translate_exp(exp->left_child->right_child->right_child,temp_no);
 			struct InterCodes* code2 = generate_assign_double_id(symbolTable[hashcode]->var_no,temp_no);
 			cat_ir(code1,code2);
@@ -535,6 +536,7 @@ struct InterCodes* translate_exp(struct Node* exp,int place){
 		}
 	}
 	else if(strcmp(exp->left_child->name,"Exp")==0&&strcmp(exp->left_child->right_child->name,"PLUS")==0){
+		//printf("1\n");
 		int temp1 = var_no++;
 		int temp2 = var_no++;
 		struct InterCodes* code1 = translate_exp(exp->left_child,temp1);
@@ -555,6 +557,7 @@ struct InterCodes* translate_exp(struct Node* exp,int place){
 		return code1;
 	}
 	else if(strcmp(exp->left_child->name,"Exp")==0&&strcmp(exp->left_child->right_child->name,"STAR")==0){
+		//printf("2\n");
 		int temp1 = var_no++;
 		int temp2 = var_no++;
 		struct InterCodes* code1 = translate_exp(exp->left_child,temp1);
@@ -696,7 +699,7 @@ struct InterCodes* translate_Args(struct Node *Args,int *arg_list){
 	if(Args->left_child->right_child == NULL){
 		int temp;
 		struct InterCodes* code1 = NULL;
-		if(strcmp(Args->left_child->left_child->name,"ID")==0){
+		if(strcmp(Args->left_child->left_child->name,"ID")==0 && Args->left_child->left_child->right_child==NULL){
 			int hashcode = hash(Args->left_child->left_child->attribute);
 			temp = symbolTable[hashcode]->var_no;
 		}

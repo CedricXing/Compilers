@@ -35,7 +35,8 @@
 %left OR
 %left AND
 %left RELOP
-%left PLUS MINUS STAR DIV
+%left PLUS MINUS
+%left STAR DIV
 %right NOT 
 %left LP RP LB RB LC RC DOT
 
@@ -193,7 +194,7 @@ while(1){
 	}
   if(exist(1,temp->left_child->attribute)) 
     print_semantic_error3(yylineno,temp->left_child->attribute);
-	else if(temp -> kind == BASIC){
+    if(temp -> kind == BASIC){
 		//printf("%s\n",temp->left_child->attribute);
 		new_symbol(3,1,$1,temp);
 	}
