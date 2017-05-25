@@ -104,7 +104,7 @@ struct InterCodes* generate_arg(int place){
 	ir->code.kind = ARG;
 	for(int i = 0;i < 16384;++ i){
 		if(symbolTable[i] != NULL){
-			if(symbolTable[i]->var_no == place && symbolTable[i]->tp->kind == ARRAY){
+			if(symbolTable[i]->var_no == place && symbolTable[i]->tp->kind == ARRAY && !symbolTable[i]->is_arg_array){
 				ir->code.u.op.kind = ADDRESS;
 				ir->code.u.op.u.var_no = place;
 				return ir;
