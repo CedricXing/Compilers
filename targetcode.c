@@ -38,6 +38,10 @@ void generate_targetcodes(){
 			while(tempIR->code.kind == PARAM){
 				if(index < 4)
 					fprintf(fp, "	sw $a%d,%d($fp)\n",index,tempValueLocations[tempIR->code.u.arg_no]);
+				else{
+					fprintf(fp, "	lw $t0,%d($fp)\n",(index - 2) * 4);
+					fprintf(fp, "	sw $t0,%d($fp)\n",tempValueLocations[tempIR->code.u.arg_no]);
+				}
 				tempIR = tempIR->next;
 				++index;
 			}
@@ -289,9 +293,12 @@ void generate_targetcodes(){
 					if(num < 4)
 						fprintf(fp, "	lw $a%d,%d($fp)\n",num,tempValueLocations[argumentNO[index]]);
 					else{
-						fprintf(fp, "	lw $t0,%d($fp)\n",tempValueLocations[argumentNO[index]]);
-						fprintf(fp, "	subu $sp,$sp,4\n");
-						fprintf(fp, "	sw $t0,0($sp)\n");
+						for(int j = 0;j <= index;++ j){
+							fprintf(fp, "	lw $t0,%d($fp)\n",tempValueLocations[argumentNO[j]]);
+							fprintf(fp, "	subu $sp,$sp,4\n");
+							fprintf(fp, "	sw $t0,0($sp)\n");
+						}
+						break;
 					}
 					++num;
 			}
@@ -321,6 +328,30 @@ void generate_targetcodes(){
 			fprintf(fp, "	lw $ra,0($sp)\n");
 			fprintf(fp, "	addi $sp,$sp,4\n");
 			fprintf(fp, "	sw $v0,%d($fp)\n",tempValueLocations[ir->code.var_no]);
+		}
+		else if(ir->code.kind == DEC){
+			fprintf(fp, "	subu $sp,$sp,%d\n",ir->code.space);
+			//fprintf(fp, "	subu $t0,$sp,$fp\n");
+			//fprintf(fp, "	sw $t0,%d($fp)\n",tempValueLocations[ir->code.u.op.u.var_no]);
+			fprintf(fp, "	sw $sp,%d($fp)\n",tempValueLocations[ir->code.u.op.u.var_no]);
+		}
+		else if(ir->code.kind == GET_ADDRESS){
+			fprintf(fp, "	lw $t0,%d($fp)\n",tempValueLocations[ir->code.u.double_op.op2.u.var_no]);
+			fprintf(fp, "	sw $t0,%d($fp)\n",tempValueLocations[ir->code.u.double_op.op1.u.var_no]);
+		}
+		else if(ir->code.kind == GET_VALUE){
+			if(ir->code.u.double_op.op1.kind == VARIABLE && ir->code.u.double_op.op2.kind == ADDRESS){
+				fprintf(fp, "	lw $t0,%d($fp)\n",tempValueLocations[ir->code.u.double_op.op2.u.var_no]);
+				//fprintf(fp, "	addu $t0,$t0,$fp\n");
+				fprintf(fp, "	lw $t1,0($t0)\n");
+				fprintf(fp, "	sw $t1,%d($fp)\n",tempValueLocations[ir->code.u.double_op.op1.u.var_no]);
+			}
+			else if(ir->code.u.double_op.op1.kind == ADDRESS && ir->code.u.double_op.op2.kind == VARIABLE){
+				fprintf(fp, "	lw $t0,%d($fp)\n",tempValueLocations[ir->code.u.double_op.op2.u.var_no]);
+				fprintf(fp, "	lw $t1,%d($fp)\n",tempValueLocations[ir->code.u.double_op.op1.u.var_no]);
+				//fprintf(fp, "	addu $t1,$t1,$fp\n");
+				fprintf(fp, "	sw $t0,0($t1)\n");
+			}
 		}
 		ir = ir -> next;
 	}
