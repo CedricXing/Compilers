@@ -68,6 +68,7 @@ struct Symbol{
 
 struct Function{
 	Type *return_type;
+	int numTemps;
 	FieldList *args;
 };
 
@@ -207,5 +208,16 @@ void cat_ir(struct InterCodes *code1,struct InterCodes *code2);
 
 //some little functions
 int check_has_else(struct Node *Stmt);
-void check_ir(struct InterCodes* ir);
+void check_ir();
 int get_space(int *arr_info,int i ,int index1);
+
+
+//experiment 4
+extern int tempValueLocations[200];
+
+void generate_targetcodes();
+void output_targetcodes();
+void outputBasicTargetCodes(FILE *fp);
+void initTempValueLocations();
+struct InterCodes* getIRByFunctionName(char *name);
+int getNumTempsBYName(char *name);

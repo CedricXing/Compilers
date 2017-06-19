@@ -23,8 +23,11 @@ void generate_InterCodes(struct Node *node){
 	}
 	else if(strcmp(node->name,"ExtDef")==0){
 		if(strcmp(node->left_child->right_child->name,"FunDec")==0){
+			var_no = 0;
 			struct InterCodes* code1 = generate_function(node->left_child->right_child->attribute);
 			struct InterCodes* code2 = translate_CompSt(node->left_child->right_child->right_child);
+			int hashcode = hash(node->left_child->right_child->attribute);
+			functionTable[hashcode]->numTemps = var_no;
 			if(head == NULL){
 				head = code1;
 				cat_ir(head,code2);
@@ -800,114 +803,114 @@ void output_InterCodes(){
 	while(ir != NULL){
 		if(ir->code.kind == FUNCTION){
 			fprintf(fp,"FUNCTION %s :\n",ir->code.u.function_name);
-			//printf("FUNCTION %s :\n",ir->code.u.function_name);
+			printf("FUNCTION %s :\n",ir->code.u.function_name);
 		}
 		else if(ir->code.kind == PARAM){
 			fprintf(fp, "PARAM %s%d\n","t",ir->code.u.arg_no);
-			//printf("PARAM %s%d\n","t",ir->code.u.arg_no);
+			printf("PARAM %s%d\n","t",ir->code.u.arg_no);
 		}
 		else if(ir->code.kind == ASSIGN){
 			if(ir->code.u.assign.right.kind == CONSTANT){
 				fprintf(fp,"t%d := #%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.value);
-				//printf("t%d := #%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.value);
+				printf("t%d := #%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.value);
 			}
 			else if(ir->code.u.assign.right.kind == VARIABLE){
 				fprintf(fp, "t%d := t%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.var_no);
-				//printf("t%d := t%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.var_no);
+				printf("t%d := t%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.var_no);
 			}
 		}
 		else if(ir->code.kind == ADD){
 			if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){//double variable
 				fprintf(fp, "t%d := t%d + t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
-				//printf("t%d := t%d + t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := t%d + t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
 			}
 		}
 		else if(ir -> code.kind == SUB){
 			if(ir->code.u.binop.op1.kind==CONSTANT && ir->code.u.binop.op2.kind==VARIABLE){//1 constant 2 variable
-				fprintf(fp, "t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.value,ir->code.u.binop.op2.u.var_no);
-				//printf("t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.value,ir->code.u.binop.op2.u.var_no);
+				fprintf(fp, "t%d := #%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.value,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := #%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.value,ir->code.u.binop.op2.u.var_no);
 			}
 			else if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){
 				fprintf(fp, "t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
-				//printf("t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
 			}
 		}
 		else if(ir->code.kind == STAR){
 			if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){//double variable
 				fprintf(fp, "t%d := t%d * t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
-				//printf("t%d := t%d * t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := t%d * t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
 			}
 			else if(ir->code.u.binop.op1.kind == VARIABLE && ir->code.u.binop.op2.kind == CONSTANT){
 				fprintf(fp, "t%d := t%d * #%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.value);
-				//printf("t%d := t%d * #%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.value);
+				printf("t%d := t%d * #%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.value);
 			}
 		}
 		else if(ir->code.kind == DIV){
 			if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){//double variable
 				fprintf(fp, "t%d := t%d / t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
-				//printf("t%d := t%d / t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := t%d / t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
 			}
 		}
 		else if(ir->code.kind == Return){
 			fprintf(fp, "RETURN t%d\n",ir->code.u.op.u.var_no);
-			//printf("RETURN t%d\n",ir->code.u.op.u.var_no);
+			printf("RETURN t%d\n",ir->code.u.op.u.var_no);
 		}
 		else if(ir->code.kind == LABEL){
 			fprintf(fp, "LABEL label%d :\n",ir->code.label_no);
-			//printf("LABEL label%d :\n",ir->code.label_no);
+			printf("LABEL label%d :\n",ir->code.label_no);
 		}
 		else if(ir->code.kind == GOTO){
 			fprintf(fp, "GOTO label%d\n",ir->code.label_no);
-			//printf("GOTO label%d\n",ir->code.label_no);
+			printf("GOTO label%d\n",ir->code.label_no);
 		}
 		else if(ir->code.kind == If){
 			if(ir->code.u.double_op.op1.kind == VARIABLE && ir->code.u.double_op.op2.kind == VARIABLE){
 				fprintf(fp, "IF t%d %s t%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.var_no,ir->code.label_no);
-				//printf("IF t%d %s t%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.var_no,ir->code.label_no);
+				printf("IF t%d %s t%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.var_no,ir->code.label_no);
 			}
 			else if(ir->code.u.double_op.op1.kind == VARIABLE && ir->code.u.double_op.op2.kind == CONSTANT){
 				fprintf(fp, "IF t%d %s #%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.value,ir->code.label_no);
-				//printf("IF t%d %s #%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.value,ir->code.label_no);
+				printf("IF t%d %s #%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.value,ir->code.label_no);
 			}
 		}
 		else if(ir->code.kind == READ){
 			fprintf(fp, "READ t%d\n",ir->code.var_no);
-			//printf("READ t%d\n",ir->code.var_no);
+			printf("READ t%d\n",ir->code.var_no);
 		}
 		else if(ir->code.kind == WRITE){
 			fprintf(fp,"WRITE t%d\n",ir->code.var_no);
-			//printf("WRITE t%d\n",ir->code.var_no);
+			printf("WRITE t%d\n",ir->code.var_no);
 		}
 		else if(ir->code.kind == ARG){
 			if(ir->code.u.op.kind == VARIABLE){
 				fprintf(fp, "ARG t%d\n",ir->code.u.op.u.var_no);
-				//printf("ARG t%d\n",ir->code.u.op.u.var_no);
+				printf("ARG t%d\n",ir->code.u.op.u.var_no);
 			}
 			else if(ir->code.u.op.kind == ADDRESS){
 				fprintf(fp, "ARG &t%d\n",ir->code.u.op.u.var_no);
-				//printf("ARG &t%d\n",ir->code.u.op.u.var_no);
+				printf("ARG &t%d\n",ir->code.u.op.u.var_no);
 			}
 		}
 		else if(ir->code.kind == CALL){
 			fprintf(fp, "t%d := CALL %s\n",ir->code.var_no,ir->code.u.function_name);
-			//printf("t%d := CALL %s\n",ir->code.var_no,ir->code.u.function_name);
+			printf("t%d := CALL %s\n",ir->code.var_no,ir->code.u.function_name);
 		}
 		else if(ir->code.kind == DEC){
 			fprintf(fp, "DEC t%d %d\n",ir->code.u.op.u.var_no,ir->code.space);
-			//printf("DEC t%d %d\n",ir->code.u.op.u.var_no,ir->code.space);
+			printf("DEC t%d %d\n",ir->code.u.op.u.var_no,ir->code.space);
 		}
 		else if(ir->code.kind == GET_ADDRESS){
 			fprintf(fp, "t%d := &t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
-			//printf("t%d := &t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+			printf("t%d := &t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
 		}
 		else if(ir->code.kind == GET_VALUE){
 			if(ir->code.u.double_op.op1.kind == VARIABLE && ir->code.u.double_op.op2.kind == ADDRESS){
 				fprintf(fp, "t%d := *t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
-				//printf("t%d := *t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+				printf("t%d := *t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
 			}
 			else if(ir->code.u.double_op.op1.kind == ADDRESS && ir->code.u.double_op.op2.kind == VARIABLE){
 				fprintf(fp, "*t%d := t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
-				//printf("*t%d := t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+				printf("*t%d := t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
 			}
 		}
 		ir = ir->next;
@@ -932,43 +935,121 @@ int check_has_else(struct Node *Stmt){
 	else return 1;
 }
 
-void check_ir(struct InterCodes *ir){
+void check_ir(){
+	struct InterCodes* ir = head;
 	while(ir != NULL){
 		if(ir->code.kind == FUNCTION){
+			//fprintf(fp,"FUNCTION %s :\n",ir->code.u.function_name);
 			printf("FUNCTION %s :\n",ir->code.u.function_name);
 		}
 		else if(ir->code.kind == PARAM){
+			//printf("##############################\n");
+			//fprintf(fp, "PARAM %s%d\n","t",ir->code.u.arg_no);
 			printf("PARAM %s%d\n","t",ir->code.u.arg_no);
 		}
 		else if(ir->code.kind == ASSIGN){
 			if(ir->code.u.assign.right.kind == CONSTANT){
+				//fprintf(fp,"t%d := #%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.value);
 				printf("t%d := #%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.value);
 			}
 			else if(ir->code.u.assign.right.kind == VARIABLE){
+				//fprintf(fp, "t%d := t%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.var_no);
 				printf("t%d := t%d\n",ir->code.u.assign.left.u.var_no,ir->code.u.assign.right.u.var_no);
 			}
 		}
 		else if(ir->code.kind == ADD){
 			if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){//double variable
+				//fprintf(fp, "t%d := t%d + t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
 				printf("t%d := t%d + t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
 			}
 		}
 		else if(ir -> code.kind == SUB){
 			if(ir->code.u.binop.op1.kind==CONSTANT && ir->code.u.binop.op2.kind==VARIABLE){//1 constant 2 variable
-				printf("t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.value,ir->code.u.binop.op2.u.var_no);
+				//fprintf(fp, "t%d := #%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.value,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := #%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.value,ir->code.u.binop.op2.u.var_no);
+			}
+			else if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){
+				//fprintf(fp, "t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := t%d - t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+			}
+		}
+		else if(ir->code.kind == STAR){
+			if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){//double variable
+				//fprintf(fp, "t%d := t%d * t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := t%d * t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+			}
+			else if(ir->code.u.binop.op1.kind == VARIABLE && ir->code.u.binop.op2.kind == CONSTANT){
+				//fprintf(fp, "t%d := t%d * #%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.value);
+				printf("t%d := t%d * #%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.value);
+			}
+		}
+		else if(ir->code.kind == DIV){
+			if(ir->code.u.binop.op1.kind==VARIABLE && ir->code.u.binop.op2.kind==VARIABLE){//double variable
+				//fprintf(fp, "t%d := t%d / t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
+				printf("t%d := t%d / t%d\n",ir->code.u.binop.result.u.var_no,ir->code.u.binop.op1.u.var_no,ir->code.u.binop.op2.u.var_no);
 			}
 		}
 		else if(ir->code.kind == Return){
+			//fprintf(fp, "RETURN t%d\n",ir->code.u.op.u.var_no);
 			printf("RETURN t%d\n",ir->code.u.op.u.var_no);
 		}
 		else if(ir->code.kind == LABEL){
+			//fprintf(fp, "LABEL label%d :\n",ir->code.label_no);
 			printf("LABEL label%d :\n",ir->code.label_no);
 		}
 		else if(ir->code.kind == GOTO){
+			//fprintf(fp, "GOTO label%d\n",ir->code.label_no);
 			printf("GOTO label%d\n",ir->code.label_no);
 		}
 		else if(ir->code.kind == If){
-			printf("IF t%d %s t%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.var_no,ir->code.label_no);
+			if(ir->code.u.double_op.op1.kind == VARIABLE && ir->code.u.double_op.op2.kind == VARIABLE){
+				//fprintf(fp, "IF t%d %s t%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.var_no,ir->code.label_no);
+				printf("IF t%d %s t%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.var_no,ir->code.label_no);
+			}
+			else if(ir->code.u.double_op.op1.kind == VARIABLE && ir->code.u.double_op.op2.kind == CONSTANT){
+				//fprintf(fp, "IF t%d %s #%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.value,ir->code.label_no);
+				printf("IF t%d %s #%d GOTO label%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.relop,ir->code.u.double_op.op2.u.value,ir->code.label_no);
+			}
+		}
+		else if(ir->code.kind == READ){
+			//fprintf(fp, "READ t%d\n",ir->code.var_no);
+			printf("READ t%d\n",ir->code.var_no);
+		}
+		else if(ir->code.kind == WRITE){
+			//fprintf(fp,"WRITE t%d\n",ir->code.var_no);
+			printf("WRITE t%d\n",ir->code.var_no);
+		}
+		else if(ir->code.kind == ARG){
+			if(ir->code.u.op.kind == VARIABLE){
+				//fprintf(fp, "ARG t%d\n",ir->code.u.op.u.var_no);
+				printf("ARG t%d\n",ir->code.u.op.u.var_no);
+			}
+			else if(ir->code.u.op.kind == ADDRESS){
+				//fprintf(fp, "ARG &t%d\n",ir->code.u.op.u.var_no);
+				printf("ARG &t%d\n",ir->code.u.op.u.var_no);
+			}
+		}
+		else if(ir->code.kind == CALL){
+			//fprintf(fp, "t%d := CALL %s\n",ir->code.var_no,ir->code.u.function_name);
+			printf("t%d := CALL %s\n",ir->code.var_no,ir->code.u.function_name);
+		}
+		else if(ir->code.kind == DEC){
+			//fprintf(fp, "DEC t%d %d\n",ir->code.u.op.u.var_no,ir->code.space);
+			printf("DEC t%d %d\n",ir->code.u.op.u.var_no,ir->code.space);
+		}
+		else if(ir->code.kind == GET_ADDRESS){
+			//fprintf(fp, "t%d := &t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+			printf("t%d := &t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+		}
+		else if(ir->code.kind == GET_VALUE){
+			if(ir->code.u.double_op.op1.kind == VARIABLE && ir->code.u.double_op.op2.kind == ADDRESS){
+				//fprintf(fp, "t%d := *t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+				printf("t%d := *t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+			}
+			else if(ir->code.u.double_op.op1.kind == ADDRESS && ir->code.u.double_op.op2.kind == VARIABLE){
+				//fprintf(fp, "*t%d := t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+				printf("*t%d := t%d\n",ir->code.u.double_op.op1.u.var_no,ir->code.u.double_op.op2.u.var_no);
+			}
 		}
 		ir = ir->next;
 	}

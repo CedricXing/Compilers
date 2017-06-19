@@ -41,7 +41,7 @@
 %left LP RP LB RB LC RC DOT
 
 %%
-Program : ExtDefList {$$ = create_node("Program",1,$1);generate_InterCodes($$);output_InterCodes();}
+Program : ExtDefList {$$ = create_node("Program",1,$1);generate_InterCodes($$);check_ir();generate_targetcodes();output_targetcodes();}
   ;
 
 ExtDefList : {$$ = create_node("ExtDefList",0,-1);}
