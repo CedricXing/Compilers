@@ -619,7 +619,7 @@ struct InterCodes* translate_exp(struct Node* exp,int place){
 		if(strcmp(exp->left_child->attribute,"read")==0){
 			return generate_read(place);
 		}
-		else return generate_call(place,exp->left_child->right_child->attribute);
+		else return generate_call(place,exp->left_child->attribute);
 	}
 	else if(strcmp(exp->left_child->name,"ID")==0 && strcmp(exp->left_child->right_child->right_child->name,"Args")==0){
 		int *arg_list = (int*)malloc(sizeof(int)*20);
